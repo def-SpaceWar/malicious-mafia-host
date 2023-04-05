@@ -1,0 +1,11 @@
+{
+  "hosting": {
+    "site": "malicious-mafia-host",
+    "public": "dist",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}
