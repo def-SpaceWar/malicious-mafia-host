@@ -1,10 +1,16 @@
-import { Flex, Button } from "@chakra-ui/react"
+import { getFirestore } from "firebase/firestore";
+import { FirestoreProvider, useFirebaseApp } from "reactfire";
+import HostGame from "./HostGame";
 
 const App = () => {
+  const
+    firebaseApp = useFirebaseApp(),
+    firestore = getFirestore(firebaseApp);
+
   return (
-    <Flex justifyContent="center" alignItems="center" width="100vw" height="100vh">
-      <Button fontSize="6xl" bgColor="green" width="25vw" height="10vh">Hi</Button>
-    </Flex>
+    <FirestoreProvider sdk={firestore}>
+      <HostGame />
+    </FirestoreProvider>
   );
 };
 
