@@ -38,12 +38,13 @@ const HostGame = () => {
         peopleCount -= m.mafiaCount;
         peopleCount -= m.jesterCount;
       });
-      if (peopleCount != 0) return false;
-      return true;
+      return peopleCount == 0;
     },
     startGame = () => {
       if (lobby.data?.length == 0) return;
-      // randomly generate roles here too eventually
+
+      // randomly assign roles here too eventually
+
       lobby.data.map((m) => {
         setDoc(doc(firestore, "gamePlayers", m.uid), {
           name: m.displayName,
@@ -80,7 +81,7 @@ const HostGame = () => {
             : (!hasGameStarted() && everyoneReady())
               ? (
                 <>
-                  <Text fontSize="6xl">{peopleReady()}/{lobby.data.length} - Configure Game!</Text>
+                  <Text fontSize="6xl">{peopleReady()}/{lobby.data.length} - Configure/Save Settings!</Text>
                   <Button fontSize="6xl" bgColor="darkGreen" _hover={{ backgroundColor: "darkGreen" }} width="35vw" height="10vh" isDisabled>Start Game</Button>
                 </>
               )
