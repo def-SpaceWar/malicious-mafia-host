@@ -95,6 +95,7 @@ const HostGame = () => {
           role: identity.role,
           association: identity.association
         });
+        deleteDoc(doc(firestore, "lobby", m.uid));
       });
     },
     stopGame = () => {
