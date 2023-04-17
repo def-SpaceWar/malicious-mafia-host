@@ -4,6 +4,20 @@ import { useFirestore, useFirestoreCollectionData } from "reactfire";
 import ConfigureGame from "./ConfigureGame";
 import RunGame from "./RunGame";
 
+type Role = "villager" | "guardian" | "mafia" | "jester";
+type Association = "innocent" | "mafia" | "third-party";
+
+const numberToData = (n: number): { role: Role, association: Association } => {
+  let role: Role = "villager";
+  let association: Association = "innocent";
+
+  if (n == 1) role = "guardian";
+  if (n == 2) role = "mafia", association = "mafia";
+  if (n == 3) role = "jester", association = "third-party";
+
+  return { role, association };
+};
+
 const HostGame = () => {
   const
     firestore = useFirestore(),
@@ -72,20 +86,6 @@ const HostGame = () => {
 
       shuffle(roles);
 
-      type Role = "villager" | "guardian" | "mafia" | "jester";
-      type Association = "innocent" | "mafia" | "third-party";
-
-      const numberToData = (n: number): {role: Role, association: Association} => {
-        let role: Role = "villager";
-        let association: Association = "innocent";
-
-        if (n == 1) role = "guardian";
-        if (n == 2) role = "mafia", association = "mafia";
-        if (n == 3) role = "jester", association = "third-party";
-
-        return { role, association };
-      };
-
       lobby.data.map((m) => {
         const identity = numberToData(roles.pop()!);
         setDoc(doc(firestore, "gamePlayers", m.uid), {
@@ -97,6 +97,8 @@ const HostGame = () => {
         });
         deleteDoc(doc(firestore, "lobby", m.uid));
       });
+
+      setDoc(doc(firestore, "gameData", "0"), { timeOfDay: "night" }, { merge: true });
     },
     stopGame = () => {
       if (gamePlayers.data.length == 0) return;

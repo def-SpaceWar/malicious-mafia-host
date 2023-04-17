@@ -51,12 +51,6 @@ export const theme = extendTheme({
             button: {
                 color: "bg",
                 fontSize: "3xl"
-            },
-            input: {
-                outline: "0",
-                border: "none",
-                bg: "bg",
-                appearence: "number-input"
             }
         }
     }
