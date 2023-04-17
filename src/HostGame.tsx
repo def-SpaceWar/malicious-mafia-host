@@ -31,14 +31,10 @@ const HostGame = () => {
   const
     everyoneReady = (): boolean => {
       if (lobby.data.length == 0) return false;
-      let everyoneReady = true;
-      lobby.data.map(m => everyoneReady = everyoneReady && m.ready);
-      return everyoneReady;
+      return lobby.data?.reduce((ready, m) => ready && m.ready, true) || false;
     },
-    peopleReady = () => {
-      let count = 0;
-      lobby.data.map(m => count += m.ready ? 1 : 0);
-      return count;
+    peopleReady = (): number => {
+      return lobby.data?.reduce((count, m) => count + m.ready ? 1 : 0, 0) || 0;
     },
     hasGameStarted = (): boolean => {
       if (gamePlayers.data?.length == 0) return false;
@@ -46,7 +42,7 @@ const HostGame = () => {
     },
     areRolesOk = (): boolean => {
       let peopleCount = lobby.data.length;
-      gameData.data.map(m => {
+      gameData.data?.map(m => {
         peopleCount -= m.villagerCount;
         peopleCount -= m.guardianCount;
         peopleCount -= m.mafiaCount;
