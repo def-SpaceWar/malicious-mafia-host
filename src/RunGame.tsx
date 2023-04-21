@@ -14,12 +14,22 @@ const RunGame = () => {
   const timeOfDay = gameData.data?.reduce((_, m) => m.timeOfDay, "night");
 
   const
+    roundNumber = gameData.data?.reduce((num, m) =>
+      m.roundNumber ? m.roundNumber : num
+      , 0) || 0,
+    haveAssasinsSelected = (): boolean => {
+      return (roundNumber % 2 == 0) && gamePlayers.data?.reduce((v, m) =>
+        (m.role == "assasin")
+          ? v && (m.dead || m.selectedTarget != undefined)
+          : v
+        , true);
+    },
     haveMafiasSelected = (): boolean => {
       return gamePlayers.data?.reduce((v, m) =>
         (m.role == "mafia")
           ? v && (m.dead || m.selectedTarget != undefined)
           : v
-        , true);
+        , true) && haveAssasinsSelected();
     },
     haveGuardiansSelected = (): boolean => {
       return gamePlayers.data?.reduce((v, m) =>
@@ -72,7 +82,8 @@ const RunGame = () => {
         const
           killed: string[] = [],
           guarded: string[] = [],
-          saved: string[] = [];
+          saved: string[] = [],
+          assasinated: string[] = [];
 
         gamePlayers.data?.map((m) => {
           if (m.role == "mafia") {
@@ -89,6 +100,8 @@ const RunGame = () => {
               killed.splice(killed.findIndex((p) => p == m.selectedTarget, 1));
               saved.push(m.selectedTarget);
             }
+          } else if (m.role == "assasin" && roundNumber % 2 == 0) {
+            assasinated.push(m.selectedTarget);
           }
         });
 
@@ -96,6 +109,13 @@ const RunGame = () => {
           if (killed.findIndex((p) => p == m.name) == -1) return;
           setDoc(doc(firestore, "gamePlayers", m.uid), { dead: true }, { merge: true });
           messages.push(m.name + " got killed by the Mafia.");
+          messages.push(m.name + ` was ${associationWithPrefix(getAssociation(m.name))}.`);
+        });
+
+        gamePlayers.data?.map((m) => {
+          if (assasinated.findIndex((p) => p == m.name) == -1) return;
+          setDoc(doc(firestore, "gamePlayers", m.uid), { dead: true }, { merge: true });
+          messages.push(m.name + " got assasinated by the Mafia.");
           messages.push(m.name + ` was ${associationWithPrefix(getAssociation(m.name))}.`);
         });
 

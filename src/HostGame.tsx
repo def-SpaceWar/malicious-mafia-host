@@ -4,7 +4,7 @@ import { useFirestore, useFirestoreCollectionData } from "reactfire";
 import ConfigureGame from "./ConfigureGame";
 import RunGame from "./RunGame";
 
-export type Role = "villager" | "guardian" | "mafia" | "jester" | "mayor";
+export type Role = "villager" | "guardian" | "mafia" | "jester" | "mayor" | "assasin";
 export type Association = "innocent" | "mafia" | "third-party";
 
 const numberToData = (n: number): { role: Role, association: Association } => {
@@ -15,6 +15,7 @@ const numberToData = (n: number): { role: Role, association: Association } => {
   if (n == 2) role = "mafia", association = "mafia";
   if (n == 3) role = "jester", association = "third-party";
   if (n == 4) role = "mayor";
+  if (n == 5) role = "assasin", association = "mafia";
 
   return { role, association };
 };
@@ -102,7 +103,8 @@ const HostGame = () => {
       setDoc(doc(firestore, "gameData", "0"), {
         timeOfDay: "night",
         message: "",
-        gameOver: false
+        gameOver: false,
+        roundNumber: 0
       }, { merge: true });
     },
     stopGame = () => {
