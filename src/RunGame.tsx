@@ -59,7 +59,7 @@ const RunGame = () => {
     },
     associationWithPrefix = (association: Association) => {
       return (association == "innocent")
-        ? "an innocent."
+        ? "an innocent"
         : "a " + association;
     },
     continueGame = () => {
