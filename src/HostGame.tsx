@@ -94,7 +94,11 @@ const HostGame = () => {
         deleteDoc(doc(firestore, "lobby", m.uid));
       });
 
-      setDoc(doc(firestore, "gameData", "0"), { timeOfDay: "night" }, { merge: true });
+      setDoc(doc(firestore, "gameData", "0"), {
+        timeOfDay: "night",
+        message: "",
+        gameOver: false
+      }, { merge: true });
     },
     stopGame = () => {
       if (gamePlayers.data.length == 0) return;
@@ -106,7 +110,7 @@ const HostGame = () => {
   return (
     <Flex width="100vw" height="100vh">
       {
-        (!hasGameStarted())
+        (!hasGameStarted() || gameData.data?.reduce((gameOver, m) => m.gameOver ? m.gameOver : gameOver, false))
           ? <ConfigureGame playerCount={lobby.data.length} />
           : <RunGame />
       }

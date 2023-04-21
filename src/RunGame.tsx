@@ -66,6 +66,7 @@ const RunGame = () => {
       if (!isReady()) return;
 
       const messages = [];
+      let gameOver = false;
 
       if (timeOfDay == "night") {
         const
@@ -141,8 +142,16 @@ const RunGame = () => {
           } else {
             messages.push(firstPlace[0] + " got voted out!");
             messages.push(firstPlace[0] + ` was ${associationWithPrefix(getAssociation(firstPlace[0]))}.`);
-            const loserUid = gamePlayers.data!.find((m) => m.name == firstPlace[0])!.uid;
+            const loserUid = gamePlayers.data?.find((m) => m.name == firstPlace[0])!.uid;
             setDoc(doc(firestore, "gamePlayers", loserUid), { dead: true }, { merge: true });
+
+            if (gamePlayers.data?.find(m => m.uid == loserUid)?.role == "jester") {
+              gameOver = true;
+              setDoc(doc(firestore, "gameData", "0"), {
+                gameOver,
+                message: "Jester won!"
+              }, { merge: true });
+            }
           }
         } else {
           messages.push("Tie!");
@@ -156,6 +165,7 @@ const RunGame = () => {
         alert(error);
       }
 
+      if (gameOver) return;
       sendMessages(messages);
 
       gamePlayers.data?.map((m) => {
@@ -164,6 +174,52 @@ const RunGame = () => {
           { selectedTarget: deleteField() }, { merge: true });
       });
     };
+
+  const gameOver = gameData.data?.reduce((gameOver, m) => m.gameOver ? m.gameOver : gameOver, false);
+  if (!gameOver) {
+    let
+      mafiasAlive = 0,
+      guardiansAlive = 0,
+      otherAlive = 0,
+      innocentsAlive = 0;
+
+    gamePlayers.data?.map((m) => {
+      if (m.dead) return;
+      if (m.association == "mafia") mafiasAlive++;
+      if (m.role == "guardian") guardiansAlive++;
+      if (m.association == "innocent") innocentsAlive++;
+      if (m.association != "mafia") otherAlive++;
+    });
+
+    const
+      onlyGuardiansAlive = guardiansAlive == otherAlive && guardiansAlive > 0,
+      guardianAndMafiaLeft = onlyGuardiansAlive && mafiasAlive > 0,
+      onlyMafiaLeft = otherAlive == 0 && mafiasAlive > 0,
+      onlyInnocentLeft = mafiasAlive == 0 && innocentsAlive > 0,
+      onlyThirdPartyLeft = mafiasAlive == 0 && innocentsAlive == 0;
+
+    if (guardianAndMafiaLeft) {
+      setDoc(doc(firestore, "gameData", "0"), {
+        gameOver: true,
+        message: "Tie! Between Mafia and Innocent."
+      }, { merge: true });
+    } else if (onlyMafiaLeft) {
+      setDoc(doc(firestore, "gameData", "0"), {
+        gameOver: true,
+        message: "Mafia won!"
+      }, { merge: true });
+    } else if (onlyInnocentLeft) {
+      setDoc(doc(firestore, "gameData", "0"), {
+        gameOver: true,
+        message: "Innocent won!"
+      }, { merge: true });
+    } else if (onlyThirdPartyLeft) {
+      setDoc(doc(firestore, "gameData", "0"), {
+        gameOver: true,
+        message: "Undecided, only third parties left."
+      }, { merge: true });
+    }
+  }
 
   return (
     <Flex
