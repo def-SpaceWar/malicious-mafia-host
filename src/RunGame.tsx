@@ -149,7 +149,8 @@ const RunGame = () => {
               gameOver = true;
               setDoc(doc(firestore, "gameData", "0"), {
                 gameOver,
-                message: "Jester won!"
+                message: "Jester won!",
+                winner: "jester"
               }, { merge: true });
             }
           }
@@ -201,22 +202,26 @@ const RunGame = () => {
     if (guardianAndMafiaLeft) {
       setDoc(doc(firestore, "gameData", "0"), {
         gameOver: true,
-        message: "Tie! Between Mafia and Innocent."
+        message: "Tie! Between Mafia and Innocent.",
+        winner: "tie"
       }, { merge: true });
     } else if (onlyMafiaLeft) {
       setDoc(doc(firestore, "gameData", "0"), {
         gameOver: true,
-        message: "Mafia won!"
+        message: "Mafia won!",
+        winner: "mafia"
       }, { merge: true });
     } else if (onlyInnocentLeft) {
       setDoc(doc(firestore, "gameData", "0"), {
         gameOver: true,
-        message: "Innocent won!"
+        message: "Innocent won!",
+        winner: "innocent"
       }, { merge: true });
     } else if (onlyThirdPartyLeft) {
       setDoc(doc(firestore, "gameData", "0"), {
         gameOver: true,
-        message: "Undecided, only third parties left."
+        message: "Undecided, only third parties left.",
+        winner: "tie"
       }, { merge: true });
     }
   }
