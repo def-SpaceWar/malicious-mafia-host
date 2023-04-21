@@ -194,7 +194,7 @@ const RunGame = () => {
 
     const
       onlyGuardiansAlive = guardiansAlive == otherAlive && guardiansAlive > 0,
-      guardianAndMafiaLeft = onlyGuardiansAlive && mafiasAlive > 0,
+      guardianAndMafiaLeft = onlyGuardiansAlive && mafiasAlive > 0 && guardiansAlive <= mafiasAlive,
       onlyMafiaLeft = otherAlive == 0 && mafiasAlive > 0,
       onlyInnocentLeft = mafiasAlive == 0 && innocentsAlive > 0,
       onlyThirdPartyLeft = mafiasAlive == 0 && innocentsAlive == 0;
