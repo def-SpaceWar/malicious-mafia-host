@@ -108,7 +108,7 @@ const RunGame = () => {
           if (m.role != "jester") return;
           setDoc(doc(firestore, "gamePlayers", m.uid), {
             selectedTarget: m.name
-          });
+          }, { merge: true });
         });
       } else if (timeOfDay == "day") {
         /** { "Aryan Ahire": 1, "skip": 2 } <- like this */
