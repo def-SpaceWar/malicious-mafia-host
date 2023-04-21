@@ -122,7 +122,7 @@ const HostGame = () => {
     <Flex width="100vw" height="100vh">
       {
         (!hasGameStarted() || gameData.data?.reduce((gameOver, m) => m.gameOver ? m.gameOver : gameOver, false))
-          ? <ConfigureGame playerCount={lobby.data?.length} />
+          ? <ConfigureGame playerCount={lobby.data?.length || 0} />
           : <RunGame />
       }
       <Flex justifyContent="center" alignItems="center" width="70vw" height="100vh" flexDir="column">
