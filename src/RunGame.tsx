@@ -17,14 +17,14 @@ const RunGame = () => {
     haveMafiasSelected = (): boolean => {
       return gamePlayers.data?.reduce((v, m) =>
         (m.role == "mafia")
-          ? v && (m.selectedTarget != undefined)
+          ? v && (m.dead || m.selectedTarget != undefined)
           : v
         , true);
     },
     haveGuardiansSelected = (): boolean => {
       return gamePlayers.data?.reduce((v, m) =>
         (m.role == "guardian")
-          ? v && (m.selectedTarget != undefined)
+          ? v && (m.dead || m.selectedTarget != undefined)
           : v
         , true);
     },
