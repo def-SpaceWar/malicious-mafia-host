@@ -119,6 +119,7 @@ const RunGame = () => {
           if (!m.selectedTarget) return;
           if (!voteMap.get(m.selectedTarget)) voteMap.set(m.selectedTarget, 0);
           voteMap.set(m.selectedTarget, voteMap.get(m.selectedTarget)! + 1);
+          if (m.role == "mayor") voteMap.set(m.selectedTarget, voteMap.get(m.selectedTarget)! + 1);
         });
 
         const
@@ -246,6 +247,7 @@ const RunGame = () => {
             fontSize="5xl"
             padding="30px"
             bgColor="darkBlue"
+            _hover={{ backgroundColor: "darkBlue" }}
             isDisabled
           >Continue</Button>
       }

@@ -4,7 +4,7 @@ import { useFirestore, useFirestoreCollectionData } from "reactfire";
 import ConfigureGame from "./ConfigureGame";
 import RunGame from "./RunGame";
 
-export type Role = "villager" | "guardian" | "mafia" | "jester";
+export type Role = "villager" | "guardian" | "mafia" | "jester" | "mayor";
 export type Association = "innocent" | "mafia" | "third-party";
 
 const numberToData = (n: number): { role: Role, association: Association } => {
@@ -14,6 +14,7 @@ const numberToData = (n: number): { role: Role, association: Association } => {
   if (n == 1) role = "guardian";
   if (n == 2) role = "mafia", association = "mafia";
   if (n == 3) role = "jester", association = "third-party";
+  if (n == 4) role = "mayor";
 
   return { role, association };
 };
@@ -47,6 +48,7 @@ const HostGame = () => {
         peopleCount -= m.guardianCount;
         peopleCount -= m.mafiaCount;
         peopleCount -= m.jesterCount;
+        peopleCount -= m.mayorCount;
       });
       return peopleCount == 0;
     },
@@ -57,13 +59,15 @@ const HostGame = () => {
         villagerCount = 0,
         guardianCount = 0,
         mafiaCount = 0,
-        jesterCount = 0;
+        jesterCount = 0,
+        mayorCount = 0;
 
       gameData.data.map(m => {
-        villagerCount = m.villagerCount;
-        guardianCount = m.guardianCount;
-        mafiaCount = m.mafiaCount;
-        jesterCount = m.jesterCount;
+        villagerCount = m.villagerCount || 0;
+        guardianCount = m.guardianCount || 0;
+        mafiaCount = m.mafiaCount || 0;
+        jesterCount = m.jesterCount || 0;
+        mayorCount = m.mayorCount || 0;
       });
 
       const roles: number[] = [];
@@ -71,6 +75,7 @@ const HostGame = () => {
       for (let i = 0; i < guardianCount; i++) roles.push(1);
       for (let i = 0; i < mafiaCount; i++) roles.push(2);
       for (let i = 0; i < jesterCount; i++) roles.push(3);
+      for (let i = 0; i < mayorCount; i++) roles.push(4);
 
       const shuffle = (a: any[]) => {
         for (let i = a.length - 1; i > 0; i--) {

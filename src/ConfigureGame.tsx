@@ -15,7 +15,8 @@ const ConfigureGame = (props: ConfigureGameProps) => {
     [villagerCount, setVillagerCount] = useState(0),
     [guardianCount, setGuardianCount] = useState(0),
     [mafiaCount, setMafiaCount] = useState(0),
-    [jesterCount, setJesterCount] = useState(0);
+    [jesterCount, setJesterCount] = useState(0),
+    [mayorCount, setMayorCount] = useState(0);
 
   const setGameOption = (option: string) => (value: number) => {
     const data: Record<string, number> = {};
@@ -28,9 +29,10 @@ const ConfigureGame = (props: ConfigureGameProps) => {
     setGameOption("guardianCount")(guardianCount);
     setGameOption("mafiaCount")(mafiaCount);
     setGameOption("jesterCount")(jesterCount);
+    setGameOption("mayorCount")(mayorCount);
   }
 
-  const playersNeeded = villagerCount + guardianCount + mafiaCount + jesterCount;
+  const playersNeeded = villagerCount + guardianCount + mafiaCount + jesterCount + mayorCount;
 
   return (
     <Flex width="30vw" height="100vh" backgroundColor="darkBg" alignItems="center" padding="20px" flexDir="column" overflowY="scroll">
@@ -83,6 +85,17 @@ const ConfigureGame = (props: ConfigureGameProps) => {
         <IconButton icon={<CloseIcon />} aria-label="" backgroundColor="red" _hover={{ backgroundColor: "lightRed" }}
           fontSize="6xl" w="80px" h="80px"
           onClick={() => setJesterCount(Math.max(0, jesterCount - 1))} />
+      </Flex>
+
+      <Heading padding="10px">Amount of Mayors: {mayorCount}</Heading>
+      <Flex width="45%" bgColor="lightBg" padding="15px">
+        <IconButton icon={<AddIcon />} aria-label="" backgroundColor="green" _hover={{ backgroundColor: "lightGreen" }}
+          fontSize="6xl" w="80px" h="80px"
+          onClick={() => setMayorCount(mayorCount + 1)} />
+        <Spacer />
+        <IconButton icon={<CloseIcon />} aria-label="" backgroundColor="red" _hover={{ backgroundColor: "lightRed" }}
+          fontSize="6xl" w="80px" h="80px"
+          onClick={() => setMayorCount(Math.max(0, mayorCount - 1))} />
       </Flex>
     </Flex>
   );
