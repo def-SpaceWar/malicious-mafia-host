@@ -30,7 +30,7 @@ const RunGame = () => {
     },
     hasEveryoneVoted = (): boolean => {
       return gamePlayers.data?.reduce((v, m) =>
-        v && m.selectedTarget != undefined
+        v && (m.dead || m.selectedTarget != undefined)
         , true);
     },
     isReady = (): boolean => {
@@ -159,6 +159,7 @@ const RunGame = () => {
       sendMessages(messages);
 
       gamePlayers.data?.map((m) => {
+        if (m.role == "jester") return;
         setDoc(doc(firestore, "gamePlayers", m.uid),
           { selectedTarget: deleteField() }, { merge: true });
       });
