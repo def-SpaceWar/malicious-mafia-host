@@ -18,11 +18,13 @@ const RunGame = () => {
       m.roundNumber ? m.roundNumber : num
       , 0) || 0,
     haveAssasinsSelected = (): boolean => {
-      return (roundNumber % 2 == 0) && gamePlayers.data?.reduce((v, m) =>
-        (m.role == "assasin")
-          ? v && (m.dead || m.selectedTarget != undefined)
-          : v
-        , true);
+      return (roundNumber % 2 == 0)
+        ? gamePlayers.data?.reduce((v, m) =>
+          (m.role == "assasin" || m.dead)
+            ? v && (m.dead || m.selectedTarget != undefined)
+            : v
+          , true)
+        : true;
     },
     haveMafiasSelected = (): boolean => {
       return gamePlayers.data?.reduce((v, m) =>
@@ -117,6 +119,8 @@ const RunGame = () => {
           setDoc(doc(firestore, "gamePlayers", m.uid), { dead: true }, { merge: true });
           messages.push(m.name + " got assasinated by the Mafia.");
           messages.push(m.name + ` was ${associationWithPrefix(getAssociation(m.name))}.`);
+          const idx = guarded.findIndex((p) => p == m.selectedTarget);
+          if (idx != -1) guarded.splice(idx, 1);
         });
 
         guarded.map((m) => messages.push(m + " was guarded."));
@@ -170,7 +174,7 @@ const RunGame = () => {
               gameOver = true;
               setDoc(doc(firestore, "gameData", "0"), {
                 gameOver,
-                message: "Jester won!",
+                message: firstPlace[0] + " won!",
                 winner: "jester"
               }, { merge: true });
             }
@@ -180,7 +184,7 @@ const RunGame = () => {
         }
 
         setDoc(doc(firestore, "gameData", "0"),
-          { timeOfDay: "night" }, { merge: true });
+          { timeOfDay: "night", roundNumber: roundNumber + 1 }, { merge: true });
       } else {
         const error = "Time of day is " + timeOfDay + "!";
         console.error(error);

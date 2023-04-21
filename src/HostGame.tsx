@@ -50,6 +50,7 @@ const HostGame = () => {
         peopleCount -= m.mafiaCount;
         peopleCount -= m.jesterCount;
         peopleCount -= m.mayorCount;
+        peopleCount -= m.assasinCount;
       });
       return peopleCount == 0;
     },
@@ -61,7 +62,8 @@ const HostGame = () => {
         guardianCount = 0,
         mafiaCount = 0,
         jesterCount = 0,
-        mayorCount = 0;
+        mayorCount = 0,
+        assasinCount = 0;
 
       gameData.data.map(m => {
         villagerCount = m.villagerCount || 0;
@@ -69,6 +71,7 @@ const HostGame = () => {
         mafiaCount = m.mafiaCount || 0;
         jesterCount = m.jesterCount || 0;
         mayorCount = m.mayorCount || 0;
+        assasinCount = m.assasinCount || 0;
       });
 
       const roles: number[] = [];
@@ -77,6 +80,7 @@ const HostGame = () => {
       for (let i = 0; i < mafiaCount; i++) roles.push(2);
       for (let i = 0; i < jesterCount; i++) roles.push(3);
       for (let i = 0; i < mayorCount; i++) roles.push(4);
+      for (let i = 0; i < assasinCount; i++) roles.push(5);
 
       const shuffle = (a: any[]) => {
         for (let i = a.length - 1; i > 0; i--) {
@@ -104,7 +108,7 @@ const HostGame = () => {
         timeOfDay: "night",
         message: "",
         gameOver: false,
-        roundNumber: 0
+        roundNumber: 1
       }, { merge: true });
     },
     stopGame = () => {
@@ -118,7 +122,7 @@ const HostGame = () => {
     <Flex width="100vw" height="100vh">
       {
         (!hasGameStarted() || gameData.data?.reduce((gameOver, m) => m.gameOver ? m.gameOver : gameOver, false))
-          ? <ConfigureGame playerCount={lobby.data.length} />
+          ? <ConfigureGame playerCount={lobby.data?.length} />
           : <RunGame />
       }
       <Flex justifyContent="center" alignItems="center" width="70vw" height="100vh" flexDir="column">

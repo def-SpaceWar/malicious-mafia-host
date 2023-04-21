@@ -16,7 +16,8 @@ const ConfigureGame = (props: ConfigureGameProps) => {
     [guardianCount, setGuardianCount] = useState(0),
     [mafiaCount, setMafiaCount] = useState(0),
     [jesterCount, setJesterCount] = useState(0),
-    [mayorCount, setMayorCount] = useState(0);
+    [mayorCount, setMayorCount] = useState(0),
+    [assasinCount, setAssasinCount] = useState(0);
 
   const setGameOption = (option: string) => (value: number) => {
     const data: Record<string, number> = {};
@@ -30,9 +31,10 @@ const ConfigureGame = (props: ConfigureGameProps) => {
     setGameOption("mafiaCount")(mafiaCount);
     setGameOption("jesterCount")(jesterCount);
     setGameOption("mayorCount")(mayorCount);
+    setGameOption("assasinCount")(assasinCount);
   }
 
-  const playersNeeded = villagerCount + guardianCount + mafiaCount + jesterCount + mayorCount;
+  const playersNeeded = villagerCount + guardianCount + mafiaCount + jesterCount + mayorCount + assasinCount;
 
   return (
     <Flex width="30vw" height="100vh" backgroundColor="darkBg" alignItems="center" padding="20px" flexDir="column" overflowY="scroll">
@@ -96,6 +98,17 @@ const ConfigureGame = (props: ConfigureGameProps) => {
         <IconButton icon={<CloseIcon />} aria-label="" backgroundColor="red" _hover={{ backgroundColor: "lightRed" }}
           fontSize="6xl" w="80px" h="80px"
           onClick={() => setMayorCount(Math.max(0, mayorCount - 1))} />
+      </Flex>
+
+      <Heading padding="10px">Amount of Assasins: {assasinCount}</Heading>
+      <Flex width="45%" bgColor="lightBg" padding="15px">
+        <IconButton icon={<AddIcon />} aria-label="" backgroundColor="green" _hover={{ backgroundColor: "lightGreen" }}
+          fontSize="6xl" w="80px" h="80px"
+          onClick={() => setAssasinCount(assasinCount + 1)} />
+        <Spacer />
+        <IconButton icon={<CloseIcon />} aria-label="" backgroundColor="red" _hover={{ backgroundColor: "lightRed" }}
+          fontSize="6xl" w="80px" h="80px"
+          onClick={() => setAssasinCount(Math.max(0, assasinCount - 1))} />
       </Flex>
     </Flex>
   );
