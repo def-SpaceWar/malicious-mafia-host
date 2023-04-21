@@ -214,7 +214,7 @@ const RunGame = () => {
     } else if (onlyInnocentLeft) {
       setDoc(doc(firestore, "gameData", "0"), {
         gameOver: true,
-        message: "Innocent won!",
+        message: "Innocents won!",
         winner: "innocent"
       }, { merge: true });
     } else if (onlyThirdPartyLeft) {
