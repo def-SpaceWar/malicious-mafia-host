@@ -4,8 +4,8 @@ import { useFirestore, useFirestoreCollectionData } from "reactfire";
 import ConfigureGame from "./ConfigureGame";
 import RunGame from "./RunGame";
 
-type Role = "villager" | "guardian" | "mafia" | "jester";
-type Association = "innocent" | "mafia" | "third-party";
+export type Role = "villager" | "guardian" | "mafia" | "jester";
+export type Association = "innocent" | "mafia" | "third-party";
 
 const numberToData = (n: number): { role: Role, association: Association } => {
   let role: Role = "villager";
@@ -34,7 +34,7 @@ const HostGame = () => {
       return lobby.data?.reduce((ready, m) => ready && m.ready, true) || false;
     },
     peopleReady = (): number => {
-      return lobby.data?.reduce((count, m) => count + m.ready ? 1 : 0, 0) || 0;
+      return lobby.data?.reduce((count, m) => m.ready ? count + 1 : count, 0) || 0;
     },
     hasGameStarted = (): boolean => {
       if (gamePlayers.data?.length == 0) return false;

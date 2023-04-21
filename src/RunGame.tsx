@@ -1,6 +1,7 @@
 import { Text, Flex, Button } from "@chakra-ui/react";
 import { collection, deleteField, doc, setDoc } from "firebase/firestore";
 import { useFirestore, useFirestoreCollectionData } from "reactfire";
+import { Association } from "./HostGame";
 
 const RunGame = () => {
   const
@@ -49,14 +50,24 @@ const RunGame = () => {
         (!m.dead && m.selectedTarget) ? count + 1 : count
         , 0) || 0;
     },
+    sendMessages = (msgs: string[]) => {
+      const message = msgs.join(" ");
+      setDoc(doc(firestore, "gameData", "0"), { message }, { merge: true });
+    },
+    getAssociation = (name: string): Association => {
+      return gamePlayers.data.reduce((association, m) => (m.name == name) ? m.association : association, "innocent");
+    },
+    associationWithPrefix = (association: Association) => {
+      return (association == "innocent")
+        ? "an innocent."
+        : "a " + association;
+    },
     continueGame = () => {
       if (!isReady()) return;
 
+      const messages = [];
+
       if (timeOfDay == "night") {
-        // get killed people, then put guarded people,
-        // unless it exists in killed people, so put it
-        // in saved people, and reveal all killed peoples
-        // associations.
         const
           killed: string[] = [],
           guarded: string[] = [],
@@ -67,12 +78,14 @@ const RunGame = () => {
             if (guarded.findIndex((p) => p == m.selectedTarget) == -1) {
               killed.push(m.selectedTarget);
             } else {
+              guarded.splice(guarded.findIndex((p) => p == m.selectedTarget, 1));
               saved.push(m.selectedTarget);
             }
           } else if (m.role == "guardian") {
             if (killed.findIndex((p) => p == m.selectedTarget) == -1) {
               guarded.push(m.selectedTarget);
             } else {
+              killed.splice(killed.findIndex((p) => p == m.selectedTarget, 1));
               saved.push(m.selectedTarget);
             }
           }
@@ -81,7 +94,12 @@ const RunGame = () => {
         gamePlayers.data?.map((m) => {
           if (killed.findIndex((p) => p == m.name) == -1) return;
           setDoc(doc(firestore, "gamePlayers", m.uid), { dead: true }, { merge: true });
+          messages.push(m.name + " got killed by the Mafia.");
+          messages.push(m.name + ` was ${associationWithPrefix(getAssociation(m.name))}.`);
         });
+
+        guarded.map((m) => messages.push(m + " was guarded."));
+        saved.map((m) => messages.push(m + " was saved from the Mafia."));
 
         setDoc(doc(firestore, "gameData", "0"),
           { timeOfDay: "day" }, { merge: true });
@@ -93,10 +111,42 @@ const RunGame = () => {
           });
         });
       } else if (timeOfDay == "day") {
-        // { "Aryan Ahire": 1, "skip": 2 } <- like this
+        /** { "Aryan Ahire": 1, "skip": 2 } <- like this */
         const voteMap: Map<string, number> = new Map();
 
-        // vote out person/skip and check if anyone won
+        gamePlayers.data?.map((m) => {
+          if (!m.selectedTarget) return;
+          if (!voteMap.get(m.selectedTarget)) voteMap.set(m.selectedTarget, 0);
+          voteMap.set(m.selectedTarget, voteMap.get(m.selectedTarget)! + 1);
+        });
+
+        const
+          entries: [a: string, b: number][] = [],
+          iterator = voteMap.entries();
+
+        let result = iterator.next();
+        while (!result.done) {
+          entries.push(result.value);
+          result = iterator.next();
+        }
+        entries.sort((a, b) => b[1] - a[1]);
+
+        const
+          firstPlace = entries[0],
+          secondPlace = entries[1] || ["", -1];
+
+        if (firstPlace[1] > secondPlace[1]) {
+          if (firstPlace[0] == "skip") {
+            messages.push("Voting skipped!");
+          } else {
+            messages.push(firstPlace[0] + " got voted out!");
+            messages.push(firstPlace[0] + ` was ${associationWithPrefix(getAssociation(firstPlace[0]))}.`);
+            const loserUid = gamePlayers.data!.find((m) => m.name == firstPlace[0])!.uid;
+            setDoc(doc(firestore, "gamePlayers", loserUid), { dead: true }, { merge: true });
+          }
+        } else {
+          messages.push("Tie!");
+        }
 
         setDoc(doc(firestore, "gameData", "0"),
           { timeOfDay: "night" }, { merge: true });
@@ -105,6 +155,8 @@ const RunGame = () => {
         console.error(error);
         alert(error);
       }
+
+      sendMessages(messages);
 
       gamePlayers.data?.map((m) => {
         setDoc(doc(firestore, "gamePlayers", m.uid),
