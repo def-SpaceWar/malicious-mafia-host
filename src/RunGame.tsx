@@ -207,11 +207,13 @@ const RunGame = () => {
       mafiasAlive = 0,
       guardiansAlive = 0,
       otherAlive = 0,
-      innocentsAlive = 0;
+      innocentsAlive = 0,
+      assassinsAlive = 0;
 
     gamePlayers.data?.map((m) => {
       if (m.dead) return;
       if (m.association == "mafia") mafiasAlive++;
+      if (m.role == "assasin") assassinsAlive++;
       if (m.role == "guardian") guardiansAlive++;
       if (m.association == "innocent") innocentsAlive++;
       if (m.association != "mafia") otherAlive++;
@@ -219,7 +221,9 @@ const RunGame = () => {
 
     const
       onlyGuardiansAlive = guardiansAlive == otherAlive && guardiansAlive > 0,
-      guardianAndMafiaLeft = onlyGuardiansAlive && mafiasAlive > 0 && guardiansAlive <= mafiasAlive,
+      guardianAndMafiaLeft = onlyGuardiansAlive && mafiasAlive > 0
+        && guardiansAlive <= mafiasAlive
+        && assassinsAlive == 0,
       onlyMafiaLeft = otherAlive == 0 && mafiasAlive > 0,
       onlyInnocentLeft = mafiasAlive == 0 && innocentsAlive > 0,
       onlyThirdPartyLeft = mafiasAlive == 0 && innocentsAlive == 0;
@@ -245,7 +249,7 @@ const RunGame = () => {
     } else if (onlyThirdPartyLeft) {
       setDoc(doc(firestore, "gameData", "0"), {
         gameOver: true,
-        message: "Undecided, only third parties left.",
+        message: "Undecided, only jester(s) left.",
         winner: "tie"
       }, { merge: true });
     }

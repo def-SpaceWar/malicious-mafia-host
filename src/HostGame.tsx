@@ -97,7 +97,6 @@ const HostGame = () => {
         setDoc(doc(firestore, "gamePlayers", m.uid), {
           name: m.displayName,
           uid: m.uid,
-          email: m.email,
           role: identity.role,
           association: identity.association
         });
